@@ -6,7 +6,7 @@ import os
 model = YOLO('modelos/pegarvisor.pt')
 
 # 2. Nome da imagem de teste na raiz
-nome_imagem = 'i1.jpeg'
+nome_imagem = '2.jpeg'
 if os.path.exists(nome_imagem):
     img_original = cv2.imread(nome_imagem)
     results = model(nome_imagem)
