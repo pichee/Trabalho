@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <title>HidroReader - Leitor de Hidrômetro</title>
+    <link rel="stylesheet" href="/static/css/mobile.css">
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <h1>💧 HidroReader</h1>
+            <p>Leitor de Hidrômetros Mobile</p>
+        </div>
+        <div class="header-user">
+            <span id="user-display" class="user-badge">👤 Operador</span>
+            <button id="btn-logout" class="btn-logout">Sair</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 1. SELETOR DE APARTAMENTO -->
+        <div class="apartment-card">
+            <label for="select-apartamento">🏢 Selecionar Apartamento:</label>
+            <div class="apartment-row">
+                <select id="select-apartamento">
+                    <option value="">-- Carregando Apartamentos --</option>
+                </select>
+                <button type="button" id="btn-add-apto" class="btn-icon-add" title="Cadastrar novo apartamento">+</button>
+            </div>
+        </div>
+
+        <input type="file" id="file-input" accept="image/*" style="display: none;">
+
+        <!-- 2. CARD DE CÂMERA -->
+        <div class="camera-card" id="camera-card">
+            <img id="preview-img" alt="Foto capturada">
+            <div class="placeholder-view" id="placeholder-view">
+                <div class="placeholder-icon">📸</div>
+                <p>Selecione o apartamento acima e capture a foto do hidrômetro</p>
+            </div>
+            <div class="loading-spinner" id="loading-view">
+                <div class="spinner"></div>
+                <p>Processando imagem com IA...</p>
+            </div>
+        </div>
+
+        <!-- 3. AÇÕES -->
+        <div class="actions-grid">
+            <button class="btn btn-secondary" id="btn-camera">📷 Tirar Foto</button>
+            <button class="btn btn-secondary" id="btn-gallery">🖼️ Galeria</button>
+            <button class="btn btn-primary" id="btn-process" disabled>⚡ Ler e Salvar Medição</button>
+        </div>
+
+        <!-- 4. RESULTADO -->
+        <div class="result-card" id="result-card">
+            <div class="reading-banner">
+                <div id="reading-apto" class="reading-apto-badge">Apartamento 101</div>
+                <div class="reading-label">Leitura Identificada</div>
+                <div class="reading-val" id="reading-val">------</div>
+                <div class="reading-meta" id="reading-meta">Aguardando...</div>
+            </div>
+
+            <div class="digits-grid" id="digits-container"></div>
+            <div class="alert-box" id="alerts-container" style="display: none;"></div>
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

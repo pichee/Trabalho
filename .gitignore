@@ -1,2 +1,41 @@
-/testes_locais
-/venv
+# Ambientes Virtuais
+venv/
+env/
+.venv/
+venv/
+# Variáveis de Ambiente e Chaves de API
+.env
+.env.local
+.env.*.local
+
+# Python / Compilação / Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Modelos e Pesos Pesados
+*.pt
+*.onnx
+*.engine
+best/
+runs/
+hidrometro_runs/
+
+# Pastas de Saída e Imagens Temporárias
+saida_recortes/
+recortes/
+
+# Datasets
+water-meter-3/
+*.zip
+*.tar.gz
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
