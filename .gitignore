@@ -26,6 +26,8 @@ hidrometro_runs/
 # Pastas de Saída e Imagens Temporárias
 saida_recortes/
 recortes/
+tmp/
+uploads/
 
 # Datasets
 water-meter-3/

@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>HidroReader - Painel Principal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/mobile.css?v=3.3" />
+  <style>
+    :root {
+      --bg-dark: #0a0a0a;
+      --bg-header: #080808;
+      --card-bg: #fafafa;
+      --surface-white: #ffffff;
+      --border-subtle: #e5e7eb;
+      --text-main: #111111;
+      --text-muted: #737373;
+      --accent: #000000;
+      --accent-hover: #1f1f1f;
+      --success-green: #15803d;
+      --success-bg: #dcfce7;
+      --transition: 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body.page-container {
+      min-height: 100vh;
+      background-color: #e9ebee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .phone-frame {
+      width: 100%;
+      max-width: 410px;
+      min-height: 800px;
+      background-color: var(--bg-dark);
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 1px 1px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ========================================================
+       TOPO BAUHAUS (IDENTIDADE HIDROREADER)
+       ======================================================== */
+    .dashboard-header {
+      position: relative;
+      background-color: var(--bg-header);
+      padding: 24px 20px 28px;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    .pattern-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
+    .dash-top-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo-icon {
+      width: 38px;
+      height: 38px;
+      background-color: #ffffff;
+      border-radius: 12px 3px 12px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .brand-logo-dot {
+      width: 16px;
+      height: 16px;
+      background-color: var(--bg-dark);
+      border-radius: 50% 50% 50% 2px;
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #4ade80;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .brand-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+    }
+
+    .header-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-ghost-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e5e5e5;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      transition: all var(--transition);
+      outline: none;
+    }
+
+    .icon-ghost-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    /* Saudação do Operador */
+    .greeting-area {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 4px;
+    }
+
+    .greeting-text-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .greeting-text-wrap h2 {
+      font-size: 19px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+
+    .greeting-role-badge {
+      font-size: 12px;
+      font-weight: 500;
+      color: #999999;
+    }
+
+    .avatar-pill {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+
+    /* ========================================================
+       FOLHA DO CONTEÚDO (CURVATURA INDUSTRIAL)
+       ======================================================== */
+    .dashboard-sheet {
+      position: relative;
+      background-color: var(--card-bg);
+      border-radius: 36px 36px 0 0;
+      flex: 1;
+      padding: 24px 20px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    /* 1. Card de Consumo / Medição Acumulada */
+    /* Grid de Ações do Hidrômetro (2x2) */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .action-tile {
+      background-color: var(--surface-white);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--transition);
+      outline: none;
+    }
+
+    .action-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+      border-color: #000000;
+    }
+
+    .action-tile:active {
+      transform: scale(0.98);
+    }
+
+    .tile-highlight {
+      background-color: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .tile-highlight:hover {
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .tile-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: #f3f4f6;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+
+    .tile-highlight .tile-icon-box {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    .tile-texts {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tile-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .tile-highlight .tile-title {
+      color: #ffffff;
+    }
+
+    .tile-sub {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .tile-highlight .tile-sub {
+      color: #a3a3a3;
+    }
+
+    /* Histórico Recente */
+    .recent-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 4px;
+      text-align: left;
+    }
+
+    .recent-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .recent-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .btn-link-action {
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px;
+      text-decoration: underline;
+    }
+
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--surface-white);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      transition: border-color var(--transition);
+    }
+
+    .recent-item:hover {
+      border-color: #000000;
+    }
+
+    .recent-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .recent-apto-pill {
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .recent-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .recent-leitura {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .recent-meta {
+      font-size: 11px;
+      color: #888888;
+    }
+
+    .recent-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--success-green);
+      background: var(--success-bg);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .empty-recent {
+      text-align: center;
+      padding: 24px 16px;
+      color: #888888;
+      font-size: 13px;
+      background: var(--surface-white);
+      border: 1px dashed var(--border-subtle);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-sm-action {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition);
+    }
+
+    .btn-sm-action:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ========================================================
+       MODAIS / GAVETAS INFERIORES (ISOLADOS)
+       ======================================================== */
+    .modal-overlay {
+      display: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      align-items: flex-end !important;
+      justify-content: center !important;
+      z-index: 1000 !important;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex !important;
+      opacity: 1 !important;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      width: 100%;
+      max-width: 430px;
+      border-radius: 28px 28px 0 0;
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 20px 24px;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      line-height: 1;
+      color: #888888;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 4px;
+    }
+
+    .modal-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+    }
+
+    /* Filtro de Condomínio & Busca */
+    .condo-filter-box {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      text-align: left;
+    }
+
+    .condo-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #777777;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .condo-select-wrapper {
+      position: relative;
+    }
+
+    .condo-select-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #111111;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .condo-select-wrapper::after {
+      content: "▼";
+      font-size: 10px;
+      color: #555555;
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .apto-search-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #111111;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .apto-search-input:focus {
+      border-color: #000000;
+    }
+
+    .aptos-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .apto-chip {
+      background: #f3f4f6;
+      padding: 12px 6px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      color: #111111;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      border: 1px solid transparent;
+    }
+
+    .apto-chip:hover {
+      background: #000000;
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .apto-chip-sub {
+      font-size: 10px;
+      font-weight: 500;
+      color: #888888;
+    }
+
+    .apto-chip:hover .apto-chip-sub {
+      color: #cccccc;
+    }
+
+    /* Visão de Detalhes do Apartamento */
+    .apto-detail-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .btn-back-apto {
+      background: #f3f4f6;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #111111;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .btn-back-apto:hover {
+      background: #e5e7eb;
+    }
+
+    .apto-badge-header {
+      background: #000000;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .apto-meta-card {
+      background: var(--bg-dark);
+      color: #ffffff;
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+
+    .apto-meta-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .apto-meta-sub {
+      font-size: 12px;
+      color: #999999;
+      margin-top: 2px;
+    }
+
+    .apto-stat-row {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #888888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .btn-action-measure {
+      width: 100%;
+      height: 48px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      transition: background-color var(--transition);
+    }
+
+    .btn-action-measure:hover {
+      background: var(--accent-hover);
+    }
+
+    .history-section-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #555555;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .apto-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .apto-reading-card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    .reading-card-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .reading-val-text {
+      font-size: 16px;
+      font-weight: 800;
+      color: #111111;
+    }
+
+    .reading-date-text {
+      font-size: 11px;
+      color: #888888;
+    }
+
+    .history-row {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f1f5;
+      gap: 4px;
+      text-align: left;
+    }
+
+    .history-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #111111;
+    }
+
+    .history-val {
+      font-weight: 800;
+      color: #000000;
+    }
+
+    .history-sub {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: #888888;
+    }
+
+    .btn-action-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 14.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-action-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      background-color: var(--accent);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2000;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    @media (max-width: 440px) {
+      body.page-container {
+        padding: 0;
+        background-color: var(--bg-dark);
+      }
+
+      .phone-frame {
+        max-width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body class="page-container">
+
+  <main class="phone-frame">
+    <!-- Topo Bauhaus com Padrão Geométrico -->
+    <header class="dashboard-header">
+      <svg class="pattern-bg" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="400" height="280" fill="#080808"/>
+        <g fill="#161616">
+          <circle cx="40" cy="40" r="40" />
+          <path d="M 0,80 A 80,80 0 0,1 80,160 L 0,160 Z" />
+          <polygon points="0,160 80,160 40,200 80,240 0,240" />
+          <circle cx="40" cy="260" r="28" />
+          
+          <path d="M 80,0 L 160,0 A 80,80 0 0,1 80,80 Z" />
+          <circle cx="120" cy="120" r="36" />
+          <polygon points="80,160 160,160 160,240" />
+          <path d="M 80,240 A 40,40 0 0,1 160,240 Z" />
+
+          <polygon points="160,0 240,0 200,40 240,80 160,80" />
+          <path d="M 160,160 L 240,80 L 240,160 Z" />
+          <circle cx="200" cy="200" r="40" />
+
+          <circle cx="280" cy="40" r="40" />
+          <path d="M 240,80 L 320,80 L 280,120 L 320,160 L 240,160 Z" />
+          <path d="M 240,160 A 80,80 0 0,1 320,240 L 240,240 Z" />
+
+          <path d="M 320,0 A 80,80 0 0,0 400,80 L 400,0 Z" />
+          <circle cx="360" cy="120" r="40" />
+          <polygon points="320,160 400,160 360,200 400,240 320,240" />
+          <circle cx="360" cy="265" r="25" />
+        </g>
+      </svg>
+
+      <!-- Barra Superior: Marca & Controles -->
+      <div class="dash-top-bar">
+        <div class="brand-group">
+          <div class="brand-logo-icon">
+            <div class="brand-logo-dot"></div>
+          </div>
+          <div class="brand-meta">
+            <span class="brand-name">HidroReader</span>
+            <span class="brand-status-pill">
+              <span class="brand-status-dot"></span>
+              IA Vision Pronta
+            </span>
+          </div>
+        </div>
+
+        <div class="header-icons">
+          <!-- Botão Sair -->
+          <button type="button" class="icon-ghost-btn" id="btn-logout" aria-label="Sair da conta" title="Sair da conta">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Identificação do Operador -->
+      <div class="greeting-area">
+        <div class="greeting-text-wrap">
+          <h2 id="greeting-name">Olá, Operador</h2>
+          <span class="greeting-role-badge" id="greeting-role">Condomínio Residencial • Bloco A</span>
+        </div>
+        <div class="avatar-pill" id="user-avatar" title="Operador Ativo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Folha Inferior com Conteúdo e Painel Operacional -->
+    <div class="dashboard-sheet">
+
+      <!-- 1. GRID 2x2 DE GESTÃO DO HIDRÔMETRO -->
+      <section class="actions-grid">
+        <!-- Ação 1: Ler Visor (Destaque Preto Hero) -->
+        <button type="button" class="action-tile tile-highlight" id="act-nova-leitura">
+          <div class="tile-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </div>
+          <div class="tile-texts">
+            <span class="tile-title">Ler Visor</span>
+            <span class="tile-sub">Câmera & IA Vision</span>
+          </div>
+        </button>
+
+        <!-- Ação 2: Apartamentos -->
+        <button type="button" class="action-tile" id="act-apartamentos">
+          <div class="tile-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div class="tile-texts">
+            <span class="tile-title">Apartamentos</span>
+            <span class="tile-sub">Unidades & Cadastro</span>
+          </div>
+        </button>
+
+        <!-- Ação 3: Histórico -->
+        <button type="button" class="action-tile" id="act-historico">
+          <div class="tile-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="tile-texts">
+            <span class="tile-title">Histórico</span>
+            <span class="tile-sub">Ver todas medições</span>
+          </div>
+        </button>
+
+        <!-- Ação 4: Exportar CSV -->
+        <button type="button" class="action-tile" id="act-exportar">
+          <div class="tile-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+          <div class="tile-texts">
+            <span class="tile-title">Exportar CSV</span>
+            <span class="tile-sub">Planilha condomínio</span>
+          </div>
+        </button>
+      </section>
+
+      <!-- 5. PRÉVIA DAS ÚLTIMAS MEDIÇÕES SALVAS -->
+      <section class="recent-section">
+        <div class="recent-header">
+          <span class="recent-title">Últimas Leituras Salvas</span>
+          <button type="button" class="btn-link-action" id="link-ver-todas">Ver todas</button>
+        </div>
+
+        <div class="recent-list" id="recent-list">
+          <div class="empty-recent">Carregando leituras...</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL / DRAWER DE HISTÓRICO -->
+  <div class="modal-overlay" id="modal-historico" style="display: none !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Histórico de Medições</h3>
+        <button type="button" class="modal-close" id="close-modal-historico">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-historico-body">
+        Carregando histórico...
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE APARTAMENTOS & HISTÓRICO ESPECÍFICO -->
+  <div class="modal-overlay" id="modal-apartamentos" style="display: none !important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-aptos-title">Apartamentos</h3>
+        <button type="button" class="modal-close" id="close-modal-apartamentos">&times;</button>
+      </div>
+
+      <!-- VISÃO 1: FILTRO POR CONDOMÍNIO + LISTA DE APARTAMENTOS -->
+      <div class="modal-body" id="modal-aptos-view-list">
+        <div class="condo-filter-box">
+          <label class="condo-label" for="select-condominio-filter">Selecionar Condomínio:</label>
+          <div class="condo-select-wrapper">
+            <select id="select-condominio-filter" class="condo-select-input">
+              <option value="">Carregando condomínios...</option>
+            </select>
+          </div>
+        </div>
+
+        <input type="text" id="input-busca-apto" class="apto-search-input" placeholder="🔍 Filtrar número (ex: 101, 204...)" />
+
+        <div id="modal-aptos-grid" class="aptos-chips-grid">
+          Carregando apartamentos...
+        </div>
+      </div>
+
+      <!-- VISÃO 2: DETALHES E HISTÓRICO DE LEITURAS DO APARTAMENTO SELECIONADO -->
+      <div class="modal-body" id="modal-apto-view-detail" style="display: none;">
+        <div class="apto-detail-nav">
+          <button type="button" class="btn-back-apto" id="btn-back-to-aptos">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Voltar
+          </button>
+          <span class="apto-badge-header" id="detail-apto-badge">Apto --</span>
+        </div>
+
+        <div class="apto-meta-card">
+          <div class="apto-meta-title" id="detail-apto-title">Apartamento --</div>
+          <div class="apto-meta-sub" id="detail-apto-sub">Bloco A • Condomínio</div>
+          <div class="apto-stat-row">
+            <div class="stat-item">
+              <span class="stat-label">Última Leitura</span>
+              <span class="stat-val" id="detail-last-reading">-- m³</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Total Medições</span>
+              <span class="stat-val" id="detail-total-readings">0</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-action-measure" id="btn-measure-this-apto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          Fazer Nova Leitura deste Apto
+        </button>
+
+        <h4 class="history-section-title">Histórico de Medições do Apto</h4>
+        <div id="detail-apto-history-list" class="apto-history-list">
+          Carregando histórico...
+        </div>
+      </div>
+
+      <div class="modal-footer" id="modal-aptos-footer">
+        <button type="button" class="btn-action-primary" id="btn-novo-apto-modal">+ Novo Apartamento</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/js/dashboard.js?v=3.3"></script>
+</body>
+</html>

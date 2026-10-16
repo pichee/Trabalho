@@ -22,5 +22,5 @@ if __name__ == "__main__":
     print(f"📚 Documentação Swagger da API:   http://localhost:8000/docs")
     print("=" * 65 + "\n")
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
