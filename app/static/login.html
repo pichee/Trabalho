@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0b4f6c">
+    <title>Login - HidroReader</title>
+    <link rel="stylesheet" href="/static/css/mobile2.css?v=2">
+</head>
+<body class="login-body">
+    <div class="login-wrapper">
+        <div class="login-header">
+            <div class="app-logo">
+                <svg class="icon-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 3.2C12 3.2 6.5 9.6 6.5 14C6.5 17.0376 8.96243 19.5 12 19.5C15.0376 19.5 17.5 17.0376 17.5 14C17.5 9.6 12 3.2 12 3.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1>HidroReader</h1>
+            <p>Sistema de Leitura de Hidrômetros Mobile</p>
+        </div>
+
+        <div class="login-card">
+            <h2>Acessar Conta</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="usuario">Usuário / Operador</label>
+                    <input type="text" id="usuario" name="usuario" placeholder="Digite seu usuário" required autofocus autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha de Acesso</label>
+                    <input type="password" id="senha" name="senha" placeholder="••••••" required autocomplete="current-password">
+                </div>
+
+                <div id="login-error" class="login-error" style="display: none;"></div>
+
+                <button type="submit" class="btn btn-primary" id="btn-login">
+                    <span>Entrar no Aplicativo</span>
+                </button>
+            </form>
+
+            <div class="login-hint">
+                <small>
+                    <svg class="icon-inline-sm" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M12 11V16M12 8.2H12.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    Usuários de demonstração:
+                </small>
+                <code>admin / admin</code> ou <code>operador / 123456</code>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/login.js?v=2"></script>
+</body>
+</html>
+

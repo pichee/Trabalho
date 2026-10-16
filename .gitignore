@@ -1,2 +1,32 @@
-/testes_locais
+# Ambientes Virtuais
 /venv
+venv/
+env/
+.venv/
+
+# Variáveis de Ambiente e Chaves de API
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Python / Compilação / Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Pastas Temporárias e Uploads
+/testes_locais
+uploads/
+tmp/
+saida_recortes/
+recortes/
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
