@@ -225,6 +225,7 @@ class LeitorIA:
         return {
             "sucesso": True,
             "leitura_completa": leitura_comp,
+            "leitura_ia": leitura_comp,
             "leitura_yolo": leitura_comp,
             "digitos_pretos": dig_pretos,
             "digitos_vermelhos": dig_vermelhos,

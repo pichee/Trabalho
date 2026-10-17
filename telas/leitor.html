@@ -259,38 +259,244 @@
       transform: none;
     }
 
-    /* Modal de Confirmação no Tema Azul */
-    body.theme-blue .confirm-icon-box {
-      background-color: var(--blue-light);
-      color: var(--blue-primary);
-      border: 1px solid var(--blue-border);
+    /* ==========================================================
+       MODAL DE CONFIRMAÇÃO DA LEITURA (BOTTOM SHEET MODERNO)
+       ========================================================== */
+    .modal-overlay {
+      display: none !important;
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(12, 74, 110, 0.55) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      align-items: flex-end !important;
+      justify-content: center !important;
+      z-index: 9999 !important;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
-    body.theme-blue .confirm-title {
+    .modal-overlay.active {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    .confirm-modal-content {
+      background: #ffffff !important;
+      width: 100% !important;
+      max-width: 420px !important;
+      border-radius: 28px 28px 0 0 !important;
+      max-height: 88vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: 22px 20px 28px !important;
+      box-shadow: 0 -12px 40px rgba(12, 74, 110, 0.35) !important;
+      transform: translateY(100%) !important;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      gap: 12px !important;
+      overflow-y: auto !important;
+      box-sizing: border-box !important;
+      margin: 0 auto !important;
+    }
+
+    .modal-overlay.active .confirm-modal-content {
+      transform: translateY(0) !important;
+    }
+
+    .confirm-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .confirm-icon-box {
+      width: 44px;
+      height: 44px;
+      background-color: var(--blue-light);
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--blue-primary);
+    }
+
+    .confirm-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--blue-deep);
+      line-height: 1.2;
+    }
+
+    .confirm-sub {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* Container seguro para a foto do hidrômetro */
+    .confirm-photo-box {
+      width: 100%;
+      height: 160px;
+      min-height: 160px;
+      max-height: 160px;
+      border-radius: 16px;
+      overflow: hidden;
+      background-color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .confirm-photo-box img {
+      width: 100%;
+      height: 100%;
+      max-height: 160px;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Card com a Leitura Lido pela IA */
+    .confirm-message-box {
+      background-color: var(--blue-surface);
+      border: 1px solid var(--blue-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .confirm-prompt-text {
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    .confirm-highlight-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--blue-primary);
+      display: block;
+      margin: 2px 0;
+      letter-spacing: 0.1em;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .confirm-question {
+      font-size: 13.5px;
+      font-weight: 700;
       color: var(--blue-deep);
     }
 
-    body.theme-blue .confirm-highlight-number {
-      color: var(--blue-primary);
+    /* Campo de ajuste manual */
+    .confirm-edit-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
     }
 
-    body.theme-blue .confirm-input {
+    .confirm-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .confirm-input {
+      flex: 1;
+      height: 48px;
       border: 2px solid var(--blue-primary);
+      border-radius: 14px;
+      padding: 0 14px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: 0.1em;
+      text-align: center;
+      outline: none;
+      background: #ffffff;
+      font-family: 'Courier New', Courier, monospace;
+      transition: all var(--transition);
     }
 
-    body.theme-blue .confirm-input:focus {
+    .confirm-input:focus {
       border-color: var(--blue-hover);
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.22);
     }
 
-    body.theme-blue .btn-confirm-save {
+    .confirm-unit {
+      font-size: 15px;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .confirm-tip {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* Botões de Confirmação e Descarte */
+    .confirm-actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-confirm-discard {
+      height: 48px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+
+    .btn-confirm-discard:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-confirm-save {
+      height: 48px;
       background-color: var(--blue-primary);
       color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+      transition: all var(--transition);
     }
 
-    body.theme-blue .btn-confirm-save:hover {
+    .btn-confirm-save:hover {
       background-color: var(--blue-hover);
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-confirm-save:active,
+    .btn-confirm-discard:active {
+      transform: scale(0.98);
     }
   </style>
 </head>
@@ -520,19 +726,21 @@
       <!-- Pergunta de validação da leitura -->
       <div class="confirm-message-box">
         <p class="confirm-prompt-text">
-          O modelo leu o número <strong id="confirm-reading-number" class="confirm-highlight-number">------</strong> nesta foto.
+          Leitura pela IA (imutável):
+          <strong id="confirm-reading-number" class="confirm-highlight-number">------</strong>
         </p>
-        <p class="confirm-question">Esta informação está correta?</p>
+        <p class="confirm-question">Deseja manter esta medição ou alterar manualmente?</p>
       </div>
 
       <!-- Campo para ajuste manual caso algum dígito tenha girado na metade -->
       <div class="confirm-edit-box">
-        <label for="input-confirm-val" class="input-label">Confirmar ou ajustar valor:</label>
+        <label for="input-confirm-val" class="input-label">Alteração do usuário (digite aqui para modificar):</label>
         <div class="confirm-input-wrap">
+          <input type="hidden" id="input-original-ia-val" value="" />
           <input type="text" id="input-confirm-val" class="confirm-input" maxlength="12" />
           <span class="confirm-unit">m³</span>
         </div>
-        <span class="confirm-tip">Revise os números antes de confirmar a persistência.</span>
+        <span class="confirm-tip">O valor lido pela IA acima será preservado no banco e não mudará.</span>
       </div>
 
       <!-- Ações de Confirmação -->
@@ -549,6 +757,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="/static/js/app.js?v=3.9"></script>
+  <script src="/static/js/app.js?v=5.0"></script>
 </body>
 </html>

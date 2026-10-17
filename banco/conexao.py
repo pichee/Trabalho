@@ -35,8 +35,31 @@ def _gerar_hash(senha: str) -> str:
     return f"{salt}${hash_obj.hex()}"
 
 def inicializar_banco():
-    """Garante que as tabelas existam e cadastra os usuários/apartamentos padrão se estiver vazio."""
+    """Garante que as tabelas existam, aplica migrações de colunas e cadastra os usuários/apartamentos padrão se estiver vazio."""
     Base.metadata.create_all(bind=engine)
+
+    # Migração automática de schema para garantir as novas colunas na tabela leituras
+    try:
+        from sqlalchemy import text
+        with engine.begin() as conn:
+            col_info = conn.execute(text("PRAGMA table_info(leituras)")).fetchall()
+            colunas_existentes = [c[1] for c in col_info]
+            if "leitura_ia" not in colunas_existentes:
+                conn.execute(text("ALTER TABLE leituras ADD COLUMN leitura_ia VARCHAR(50);"))
+                if "leitura_yolo" in colunas_existentes:
+                    conn.execute(text("UPDATE leituras SET leitura_ia = leitura_yolo WHERE leitura_ia IS NULL;"))
+            if "leitura_usuario" not in colunas_existentes:
+                conn.execute(text("ALTER TABLE leituras ADD COLUMN leitura_usuario VARCHAR(50);"))
+                if "leitura_yolo" in colunas_existentes:
+                    conn.execute(text("UPDATE leituras SET leitura_usuario = leitura_yolo WHERE leitura_usuario IS NULL;"))
+            # Remove colunas antigas e desnecessárias
+            if "leitura_yolo" in colunas_existentes:
+                conn.execute(text("ALTER TABLE leituras DROP COLUMN leitura_yolo;"))
+            if "leitura_tflite" in colunas_existentes:
+                conn.execute(text("ALTER TABLE leituras DROP COLUMN leitura_tflite;"))
+    except Exception as e:
+        print(f"[Aviso] Falha ao verificar/migrar colunas em leituras: {e}")
+
     db = SessionLocal()
     try:
         # Usuários padrão

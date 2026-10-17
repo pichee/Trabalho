@@ -32,17 +32,24 @@ async def obter_resumo_dashboard(
 
     for l in leituras:
         # Tenta extrair os m³ dos dígitos pretos ou leitura
-        valor_str = l.leitura_yolo or "0"
+        valor_str = l.leitura_usuario or "0"
         try:
             m3_val = float(valor_str[:4]) if len(valor_str) >= 4 else float(valor_str)
             volume_total += m3_val
         except Exception:
             pass
 
+        valor_ia = l.leitura_ia or ""
+        valor_usuario = l.leitura_usuario or ""
+        foi_ajustada = bool(valor_ia and valor_usuario and valor_ia != valor_usuario)
+
         ultimas.append({
             "id": l.id,
             "apartamento": l.apartamento_numero or "---",
-            "leitura": l.leitura_yolo,
+            "leitura": valor_usuario,
+            "leitura_ia": valor_ia,
+            "leitura_usuario": valor_usuario,
+            "foi_ajustada": foi_ajustada,
             "operador": l.usuario_nome or "Operador",
             "confianca": f"{l.confianca_media:.0f}%",
             "data": l.criado_em.strftime("%d/%m/%Y %H:%M") if l.criado_em else "---",
@@ -68,14 +75,16 @@ async def exportar_leituras_csv(
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=';')
-    writer.writerow(["ID", "Apartamento", "Leitura Completa (m³)", "Confiança IA", "Operador", "Observações", "Data/Hora"])
+    writer.writerow(["ID", "Apartamento", "Leitura Final (m³)", "Leitura IA", "Alteração Usuário", "Confiança IA", "Operador", "Observações", "Data/Hora"])
 
     for l in leituras:
         writer.writerow([
             l.id,
             l.apartamento_numero or "",
-            l.leitura_yolo or "",
-            f"{l.confianca_media:.1f}%",
+            l.leitura_usuario or "",
+            l.leitura_ia or "",
+            l.leitura_usuario or "",
+            f"{l.confianca_media:.1f}%" if l.confianca_media else "",
             l.usuario_nome or "",
             l.observacoes or "",
             l.criado_em.strftime("%d/%m/%Y %H:%M:%S") if l.criado_em else ""

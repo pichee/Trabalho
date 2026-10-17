@@ -121,15 +121,20 @@ document.addEventListener("DOMContentLoaded", () => {
         leituras.slice(0, 4).forEach(l => {
             const item = document.createElement("div");
             item.className = "recent-item";
+            const badgeTexto = l.foi_ajustada ? "Ajustado" : `${l.confianca} IA`;
+            const badgeStyle = l.foi_ajustada ? "background-color: #fef3c7; color: #b45309;" : "";
+            const metaTexto = l.foi_ajustada 
+                ? `${l.operador} • ${l.data} <span style="display:block; font-size:10px; color:#0284c7;">IA: ${l.leitura_ia} → Ajuste: ${l.leitura_usuario}</span>`
+                : `${l.operador} • ${l.data}`;
             item.innerHTML = `
                 <div class="recent-left">
                     <div class="recent-apto-pill">Apto ${l.apartamento}</div>
                     <div class="recent-info">
                         <span class="recent-leitura">${l.leitura} m³</span>
-                        <span class="recent-meta">${l.operador} • ${l.data}</span>
+                        <span class="recent-meta">${metaTexto}</span>
                     </div>
                 </div>
-                <div class="recent-badge">${l.confianca} IA</div>
+                <div class="recent-badge" style="${badgeStyle}">${badgeTexto}</div>
             `;
             recentList.appendChild(item);
         });
@@ -366,13 +371,18 @@ document.addEventListener("DOMContentLoaded", () => {
             data.leituras.forEach(l => {
                 const card = document.createElement("div");
                 card.className = "apto-reading-card";
+                const badgeTexto = l.foi_ajustada ? "Ajustado" : l.confianca;
+                const badgeStyle = l.foi_ajustada ? "background-color: #fef3c7; color: #b45309;" : "";
+                const subTexto = l.foi_ajustada
+                    ? `Por ${l.operador} • ${l.data} <span style="display:block; font-size:10px; color:#0284c7;">IA leu: ${l.leitura_ia} | Confirmado: ${l.leitura_usuario}</span>`
+                    : `Por ${l.operador} • ${l.data}`;
                 card.innerHTML = `
                     <div class="reading-card-left">
                         <span class="reading-val-text">${l.leitura} m³</span>
-                        <span class="reading-date-text">Por ${l.operador} • ${l.data}</span>
+                        <span class="reading-date-text">${subTexto}</span>
                         ${l.observacoes ? `<span style="font-size: 11px; color: #666;">${l.observacoes}</span>` : ""}
                     </div>
-                    <span class="recent-badge">${l.confianca}</span>
+                    <span class="recent-badge" style="${badgeStyle}">${badgeTexto}</span>
                 `;
                 detailAptoHistoryList.appendChild(card);
             });

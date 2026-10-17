@@ -79,9 +79,16 @@ async def historico_apartamento(
 
     lista_leituras = []
     for l in leituras:
+        valor_ia = l.leitura_ia or ""
+        valor_usuario = l.leitura_usuario or ""
+        foi_ajustada = bool(valor_ia and valor_usuario and valor_ia != valor_usuario)
+
         lista_leituras.append({
             "id": l.id,
-            "leitura": l.leitura_yolo,
+            "leitura": valor_usuario,
+            "leitura_ia": valor_ia,
+            "leitura_usuario": valor_usuario,
+            "foi_ajustada": foi_ajustada,
             "confianca": f"{l.confianca_media:.1f}%" if l.confianca_media else "95%",
             "data": l.criado_em.strftime("%d/%m/%Y %H:%M") if l.criado_em else "-",
             "operador": l.usuario_nome or "Operador",

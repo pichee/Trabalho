@@ -51,12 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmAptoText = document.getElementById("confirm-apto-text");
     const confirmImgPreview = document.getElementById("confirm-img-preview");
     const confirmReadingNumber = document.getElementById("confirm-reading-number");
+    const inputOriginalIaVal = document.getElementById("input-original-ia-val");
     const inputConfirmVal = document.getElementById("input-confirm-val");
     const btnDiscardConfirm = document.getElementById("btn-discard-confirm");
     const btnSaveConfirm = document.getElementById("btn-save-confirm");
 
     let currentFile = null;
     let ultimaPredicaoIA = null;
+    let leituraIaImutavel = "";
 
     function showToast(msg, isSuccess = true) {
         if (!toast) return;
@@ -384,10 +386,13 @@ document.addEventListener("DOMContentLoaded", () => {
             ultimaPredicaoIA = data;
 
             // Prepara a tela de confirmação solicitada pelo usuário
-            const valorLido = data.leitura_completa || data.leitura_yolo || "------";
+            const valorLido = (data.leitura_ia || data.leitura_completa || "").trim();
+            leituraIaImutavel = valorLido; // Grava em memória imutável
+
             confirmAptoText.textContent = `Apto ${aptoSelecionado} • ${condoSelecionado}`;
             confirmImgPreview.src = previewImg.src;
             confirmReadingNumber.textContent = valorLido;
+            if (inputOriginalIaVal) inputOriginalIaVal.value = valorLido;
             inputConfirmVal.value = valorLido;
 
             // Abre o modal de confirmação
@@ -418,6 +423,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // O valor original detectado pela IA NUNCA é alterado pelo input do usuário
+            const valorOriginalIA = (
+                leituraIaImutavel ||
+                (inputOriginalIaVal && inputOriginalIaVal.value) ||
+                confirmReadingNumber.textContent ||
+                ultimaPredicaoIA.leitura_ia ||
+                ultimaPredicaoIA.leitura_completa ||
+                ""
+            ).trim();
+
+            const houveAlteracaoManual = Boolean(valorOriginalIA && valorOriginalIA !== valorConfirmado);
+
             const apto = selectApartamento.value;
             const condo = selectCondominio.value;
 
@@ -425,6 +442,14 @@ document.addEventListener("DOMContentLoaded", () => {
             btnSaveConfirm.textContent = "Salvando...";
 
             try {
+                let obs = (ultimaPredicaoIA.avisos && ultimaPredicaoIA.avisos.length > 0)
+                    ? ultimaPredicaoIA.avisos.join("; ")
+                    : "Leitura confirmada pelo operador";
+
+                if (houveAlteracaoManual) {
+                    obs = `Ajustado manualmente pelo operador (IA leu: ${valorOriginalIA})`;
+                }
+
                 const resp = await fetch("/api/v1/leituras/confirmar", {
                     method: "POST",
                     headers: {
@@ -434,11 +459,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: JSON.stringify({
                         apartamento: apto,
                         condominio: condo,
-                        leitura: valorConfirmado,
+                        leitura_ia: valorOriginalIA,
+                        leitura_usuario: valorConfirmado,
                         confianca_media: ultimaPredicaoIA.confianca_media || 95.0,
-                        observacoes: (ultimaPredicaoIA.avisos && ultimaPredicaoIA.avisos.length > 0)
-                            ? ultimaPredicaoIA.avisos.join("; ")
-                            : "Leitura confirmada pelo operador",
+                        observacoes: obs,
                         caminho_foto: ultimaPredicaoIA.caminho_foto || null
                     })
                 });
@@ -449,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 fecharModal(modalConfirmacao);
-                exibirResultadoFinal(ultimaPredicaoIA, apto, valorConfirmado);
+                exibirResultadoFinal(ultimaPredicaoIA, apto, valorConfirmado, valorOriginalIA);
                 showToast(`Medição do Apto ${apto} salva com sucesso!`, true);
             } catch (e) {
                 showToast("Erro: " + e.message, false);
@@ -460,7 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function exibirResultadoFinal(data, apto, valorFinal) {
+    function exibirResultadoFinal(data, apto, valorFinal, valorIAOriginal) {
         readingApto.textContent = `Apartamento ${apto}`;
         readingVal.textContent = valorFinal;
         
@@ -474,16 +498,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Status pill
         if (readingStatusPill) {
-            const statusTexto = data.qualidade_visor || "Verificado";
-            readingStatusPill.textContent = "Salvo com Sucesso";
-            readingStatusPill.style.color = "#15803d";
-            readingStatusPill.style.backgroundColor = "#ecfdf5";
+            if (valorIAOriginal && valorIAOriginal !== valorFinal) {
+                readingStatusPill.textContent = "Ajustado Manualmente";
+                readingStatusPill.style.color = "#b45309";
+                readingStatusPill.style.backgroundColor = "#fef3c7";
+            } else {
+                readingStatusPill.textContent = "Salvo com Sucesso";
+                readingStatusPill.style.color = "#15803d";
+                readingStatusPill.style.backgroundColor = "#ecfdf5";
+            }
         }
 
         // Metadados
         let metaTexto = `Modelo: ${data.modelo_utilizado || "IA Vision"}`;
         if (data.confianca_media) {
             metaTexto += ` • Confiança: ${data.confianca_media}%`;
+        }
+        if (valorIAOriginal && valorIAOriginal !== valorFinal) {
+            metaTexto += `<br><span style="font-size:11px; color:#0369a1; font-weight:600;">(Valor Confirmado: <strong>${valorFinal}</strong> • IA original: <strong>${valorIAOriginal}</strong>)</span>`;
         }
         metaTexto += `<br><span style="font-size:11px; color:#555;">Salvo e confirmado no banco de dados.</span>`;
         readingMeta.innerHTML = metaTexto;

@@ -29,6 +29,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Middleware para impedir cache agressivo do navegador em arquivos JS/CSS e HTML
+@app.middleware("http")
+async def desabilitar_cache_estatico(request, call_next):
+    response = await call_next(request)
+    caminho = request.url.path
+    if caminho.startswith("/static") or caminho in ("/leitor", "/dashboard", "/login", "/"):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 # Monta arquivos estáticos (CSS, JS) da pasta telas/
 pasta_telas = Path(__file__).parent / "telas"
 if pasta_telas.exists():
