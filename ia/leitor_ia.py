@@ -72,9 +72,10 @@ class LeitorIA:
         self._carregar_modelo()
 
     def _carregar_modelo(self):
+        diretorio_raiz = Path(__file__).resolve().parent.parent
         caminhos = [
+            str(diretorio_raiz / "modelos_ia" / "pegarvisor.pt"),
             os.path.join("modelos_ia", "pegarvisor.pt"),
-            os.path.join("modelos", "pegarvisor.pt"),
             "pegarvisor.pt"
         ]
         for c in caminhos:

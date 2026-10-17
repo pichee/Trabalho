@@ -16,31 +16,16 @@ O sistema é construído sobre os pilares da **Clean Architecture** adaptada par
 
 ## 📂 Guia Detalhado de Cada Diretório
 
-### 1. `app/` — Núcleo da Aplicação
-Contém todo o código da aplicação. Nada de regras de negócio ou telas deve ficar fora de `app/`.
+### 1. Diretórios da Aplicação
 
-| Subdiretório | Responsabilidade | O que DEVE ter aqui | O que NÃO deve ter aqui |
+| Diretório | Responsabilidade | O que DEVE ter aqui | O que NÃO deve ter aqui |
 | :--- | :--- | :--- | :--- |
-| **`app/api/`** | **Camada HTTP** | Roteadores FastAPI, endpoints REST, injeção de dependências (`deps.py`), validação de tokens JWT. | Consultas SQL diretas, lógica pesada de visão computacional. |
-| **`app/core/`** | **Fundação do Sistema** | Leitura de `.env` (`config.py`), conexão com banco (`database.py`), criptografia e JWT (`security.py`), scripts de seed (`init_db.py`). | Rotas HTTP, templates visuais. |
-| **`app/models/`** | **Modelos ORM (Banco)** | Classes SQLAlchemy que mapeiam tabelas relacionais (`Usuario`, `Apartamento`, `Leitura`). | Schemas Pydantic, lógica de rotas. |
-| **`app/schemas/`** | **Contratos de Dados (DTO)** | Schemas Pydantic para validar entradas e saídas de dados com tipagem estrita e documentação automática no Swagger. | Consultas a banco de dados. |
-| **`app/services/`** | **Regras de Negócio e IA** | Pipeline de Visão Computacional (`services/vision/pipeline.py`), chamada aos modelos YOLO e integração com a API Gemini Vision. | Lógica de respostas HTTP diretas. |
-| **`app/static/`** | **Frontend Mobile** | Interface Web responsiva: HTMLs (`login.html`, `index.html`), folhas de estilo (`css/mobile.css`) e scripts do cliente (`js/`). | Códigos Python ou arquivos de backend. |
-
----
-
-### 2. `modelos/` — Pesos e Modelos de Machine Learning
-- **Propósito:** Armazenamento centralizado de pesos de redes neurais (`.pt`, `.h5`, `.onnx`).
-- **Arquivos Atuais:**
-  - `pegarvisor.pt`: Modelo treinado YOLO para detecção e recorte preciso do mostrador mecânico.
-  - `modelo_hidrometro.h5`: Modelo histórico preservado para referência.
-
----
-
-### 3. `experimentos/` — Scripts de Teste e Amostras
-- **Propósito:** Isolar códigos de laboratório, testes de acurácia manuais e imagens de exemplo para não poluir o código de produção.
-- **Arquivos:** Scripts exploratórios como `pegar_visor.py` e pastas com amostras de fotos.
+| **`rotas/`** | **Camada HTTP / Endpoints** | Roteadores FastAPI dedicados (`rota_login.py`, `rota_apartamentos.py`, `rota_leitura.py`, `rota_dashboard.py`, `rota_paginas.py`). | Consultas SQL pesadas diretas ou inferência direta de redes neurais. |
+| **`banco/`** | **Conexão e Modelos ORM** | Configuração do SQLAlchemy (`conexao.py`) e tabelas relacionais (`modelos.py`: `Usuario`, `Apartamento`, `Leitura`). | Rotas HTTP, regras visuais. |
+| **`seguranca/`** | **Autenticação e Sessão** | Hashing de senhas, criação e validação de tokens JWT (`autenticacao.py`). | Lógica de negócio de apartamentos ou fotos. |
+| **`ia/`** | **Visão Computacional e IA** | Pipeline de Visão (`leitor_ia.py`): detecção/recorte do visor com YOLO e leitura dos dígitos com Gemini Vision. | Endpoints HTTP diretos. |
+| **`telas/`** | **Frontend Mobile** | Interface Web responsiva: HTMLs (`login.html`, `dashboard.html`, `leitor.html`), estilos (`css/mobile.css`) e scripts (`js/`). | Códigos Python ou arquivos de backend. |
+| **`modelos_ia/`** | **Pesos de Machine Learning** | Arquivos de pesos treinados das redes neurais (`pegarvisor.pt`). | Códigos Python ou datasets brutos. |
 
 ---
 
@@ -69,7 +54,7 @@ sequenceDiagram
     API->>Dep: Valida token JWT do operador
     Dep-->>API: Operador autenticado (ex: Admin)
     API->>IA: visao_service.processar_imagem(bytes)
-    IA->>IA: 1. YOLO detecta e recorta o visor (modelos/pegarvisor.pt)
+    IA->>IA: 1. YOLO detecta e recorta o visor (modelos_ia/pegarvisor.pt)
     IA->>IA: 2. Filtro Sobel avalia foco e contraste
     IA->>IA: 3. Gemini Vision lê e separa m³ (pretos) e Litros (vermelhos)
     IA-->>API: Resultado estruturado (LeituraResponseSchema)

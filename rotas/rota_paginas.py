@@ -23,10 +23,9 @@ async def pagina_login():
 
 @router.get("/leitor", summary="Tela do leitor de hidrômetro")
 async def pagina_leitor():
-    for nome in ["leitor.html", "index.html"]:
-        arquivo = PASTA_TELAS / nome
-        if arquivo.exists():
-            return FileResponse(str(arquivo))
+    arquivo = PASTA_TELAS / "leitor.html"
+    if arquivo.exists():
+        return FileResponse(str(arquivo))
     return {"erro": "Tela do leitor não encontrada."}
 
 @router.get("/dashboard", summary="Tela inicial do aplicativo estilo Nubank")
