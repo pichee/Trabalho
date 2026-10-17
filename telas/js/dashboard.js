@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
             condominiosCadastrados.forEach(c => {
                 const opt = document.createElement("option");
                 opt.value = c;
-                opt.textContent = `🏢 ${c}`;
+                opt.textContent = c;
                 selectCondoFilter.appendChild(opt);
             });
 
@@ -449,13 +449,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // 6. Guia e Ajuda da IA
     if (actGuiaIA) {
         actGuiaIA.addEventListener("click", () => {
-            alert("💡 Dicas para leitura perfeita com IA:\n\n1. Aproxime a câmera a 15-20cm do hidrômetro.\n2. Certifique-se de que o mostrador de roletes está bem iluminado.\n3. O YOLO recorta o visor e o Gemini Vision lê os números pretos e vermelhos automaticamente.");
+            alert("Dicas para leitura perfeita com IA:\n\n1. Aproxime a câmera a 15-20cm do hidrômetro.\n2. Certifique-se de que o mostrador de roletes está bem iluminado.\n3. O YOLO recorta o visor e o Gemini Vision lê os números pretos e vermelhos automaticamente.");
         });
     }
 
     if (btnHelp) {
         btnHelp.addEventListener("click", () => {
-            alert("💧 HidroReader Mobile v1.0.0\n\nSistema para condomínios e inspeção predial.\nPara dúvidas ou suporte, consulte o administrador.");
+            alert("HidroReader Mobile v1.0.0\n\nSistema para condomínios e inspeção predial.\nPara dúvidas ou suporte, consulte o administrador.");
         });
     }
 

@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function showToast(msg, isSuccess = true) {
         if (!toast) return;
         toast.textContent = msg;
-        toast.style.background = isSuccess ? "#0a0a0a" : "#dc2626";
+        toast.style.background = isSuccess ? "#0284c7" : "#dc2626";
         toast.classList.add("show");
         setTimeout(() => {
             toast.classList.remove("show");
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
             condominios.forEach(c => {
                 const opt = document.createElement("option");
                 opt.value = c;
-                opt.textContent = `🏢 ${c}`;
+                opt.textContent = c;
                 selectCondominio.appendChild(opt);
             });
 
@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (file.size === 0) {
-            showToast("⚠️ O app de câmera retornou arquivo vazio. Tente pela opção 'Escolher da Galeria'.", false);
+            showToast("O app de câmera retornou arquivo vazio. Tente pela opção 'Escolher da Galeria'.", false);
             return;
         }
 
@@ -283,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (placeholderView) placeholderView.style.display = "none";
                 btnProcess.disabled = false;
                 resultCard.classList.remove("active");
-                showToast("✅ Foto pronta para análise com IA!", true);
+                showToast("Foto pronta para análise com IA!", true);
             };
 
             previewImg.onerror = () => {
@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (placeholderView) placeholderView.style.display = "none";
                     btnProcess.disabled = false;
                     resultCard.classList.remove("active");
-                    showToast("✅ Foto pronta para análise!", true);
+                    showToast("Foto pronta para análise!", true);
                 };
                 reader.readAsDataURL(file);
             };
@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (placeholderView) placeholderView.style.display = "none";
                 btnProcess.disabled = false;
                 resultCard.classList.remove("active");
-                showToast("✅ Foto pronta para análise!", true);
+                showToast("Foto pronta para análise!", true);
             };
             reader.readAsDataURL(file);
         }
@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 5. 1ª ETAPA: Analisar com IA sem salvar diretamente
     btnProcess.addEventListener("click", async () => {
         if (!currentFile) {
-            showToast("⚠️ Tire uma foto do visor antes de analisar!", false);
+            showToast("Tire uma foto do visor antes de analisar!", false);
             return;
         }
 
@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const condoSelecionado = selectCondominio.value;
 
         if (!aptoSelecionado) {
-            showToast("⚠️ Selecione o condomínio e apartamento antes de analisar!", false);
+            showToast("Selecione o condomínio e apartamento antes de analisar!", false);
             selectApartamento.focus();
             return;
         }
@@ -450,12 +450,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 fecharModal(modalConfirmacao);
                 exibirResultadoFinal(ultimaPredicaoIA, apto, valorConfirmado);
-                showToast(`✅ Medição do Apto ${apto} salva com sucesso!`, true);
+                showToast(`Medição do Apto ${apto} salva com sucesso!`, true);
             } catch (e) {
                 showToast("Erro: " + e.message, false);
             } finally {
                 btnSaveConfirm.disabled = false;
-                btnSaveConfirm.textContent = "✓ Sim, Salvar";
+                btnSaveConfirm.textContent = "Sim, Salvar";
             }
         });
     }
@@ -511,7 +511,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.avisos && data.avisos.length > 0) {
             alertsContainer.style.display = "flex";
             alertsContainer.innerHTML = `
-                <strong>⚠️ Observações da Inspeção:</strong>
+                <strong style="display:flex; align-items:center; gap:5px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    Observações da Inspeção:
+                </strong>
                 ${data.avisos.map(a => `<div>• ${a}</div>`).join("")}
             `;
         } else {
