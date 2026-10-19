@@ -1,0 +1,30 @@
+[20:00:41.861] IP=127.0.0.1 EV=server_ready INFO=
+[20:01:00.859] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:01:21.902] IP=192.168.2.105 EV=click_camera INFO=Residencial das Palmeiras:202
+[20:01:34.612] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:01:36.210] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:01:41.287] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:01:42.319] IP=192.168.2.105 EV=click_camera INFO=Residencial das Palmeiras:202
+[20:01:52.397] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:01:55.381] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:08:42.446] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:08:49.071] IP=192.168.2.105 EV=click_camera INFO=Residencial das Palmeiras:202
+[20:09:09.150] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:22:48.844] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:22:51.516] IP=192.168.2.105 EV=click_camera INFO=Residencial das Palmeiras:202
+[20:23:03.764] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:23:08.200] IP=192.168.2.105 EV=page_load INFO=camFiles=0
+[20:23:08.592] IP=192.168.2.105 EV=pageshow INFO=persisted=false
+[20:23:09.626] IP=192.168.2.105 EV=shield_audio_playing INFO=ok
+[20:23:09.627] IP=192.168.2.105 EV=shield_audio_playing INFO=ok
+[20:23:09.676] IP=192.168.2.105 EV=click_camera INFO=Residencial das Palmeiras:202
+[20:23:09.689] IP=192.168.2.105 EV=shield_audio_playing INFO=ok
+[20:23:11.949] IP=192.168.2.105 EV=visibility INFO=hidden
+[20:23:14.614] IP=192.168.2.105 EV=bg_alive_ping INFO=1
+[20:23:16.731] IP=192.168.2.105 EV=bg_alive_ping INFO=1
+[20:23:18.647] IP=192.168.2.105 EV=bg_alive_ping INFO=1
+[20:23:20.946] IP=192.168.2.105 EV=visibility INFO=visible
+[20:23:20.971] IP=192.168.2.105 EV=change_camera INFO=1
+[20:23:21.038] IP=192.168.2.105 EV=aplicar_foto_inicio INFO=câmera_17923657917962724817983481404268.jpg_3440517
+[20:23:21.509] PRE_CARREGAR user=1 nome=17923657917962724817983481404268.jpg bytes=3440517
+[20:23:21.964] IP=192.168.2.105 EV=pre_carregar_sucesso INFO=147KB

@@ -11,9 +11,7 @@ router = APIRouter(tags=["Páginas Web"])
 PASTA_TELAS = Path(__file__).resolve().parent.parent / "telas"
 
 NO_CACHE_HEADERS = {
-    "Cache-Control": "no-cache, no-store, must-revalidate",
-    "Pragma": "no-cache",
-    "Expires": "0"
+    "Cache-Control": "private, no-cache"
 }
 
 @router.get("/", summary="Redireciona para o login")

@@ -29,15 +29,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Middleware para impedir cache agressivo do navegador em arquivos JS/CSS e HTML
+# Middleware para revalidação de arquivos estáticos sem destruir o estado da página no Android (sem no-store)
 @app.middleware("http")
 async def desabilitar_cache_estatico(request, call_next):
     response = await call_next(request)
     caminho = request.url.path
-    if caminho.startswith("/static") or caminho in ("/leitor", "/dashboard", "/login", "/"):
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
+    if caminho.startswith("/static"):
+        response.headers["Cache-Control"] = "no-cache"
+    elif caminho in ("/leitor", "/dashboard", "/login", "/"):
+        response.headers["Cache-Control"] = "private, no-cache"
     return response
 
 # Monta arquivos estáticos (CSS, JS) da pasta telas/
