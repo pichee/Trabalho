@@ -4,6 +4,7 @@ import json
 import hmac
 import hashlib
 import base64
+import logging
 from typing import Optional, Dict, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -11,7 +12,14 @@ from sqlalchemy.orm import Session
 from banco.conexao import get_db
 from banco.modelos import Usuario
 
+logger = logging.getLogger("hidroreader.auth")
+
 SECRET_KEY = os.getenv("SECRET_KEY", "hidroreader_secret_key_2026")
+DEFAULT_EXPIRE_HOURS = int(os.getenv("TOKEN_EXPIRE_HOURS", "24"))
+
+if os.getenv("ENVIRONMENT", "").lower() == "production" and SECRET_KEY == "hidroreader_secret_key_2026":
+    logger.warning("ATENÇÃO: SECRET_KEY padrão em uso em ambiente de produção! Configure a variável SECRET_KEY no seu .env.")
+
 security_scheme = HTTPBearer(auto_error=False)
 
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
@@ -25,10 +33,11 @@ def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
     except Exception:
         return False
 
-def criar_token(dados: Dict[str, Any], expira_horas: int = 24) -> str:
+def criar_token(dados: Dict[str, Any], expira_horas: Optional[int] = None) -> str:
     """Cria um token assinado com validade configurável."""
+    horas = expira_horas if expira_horas is not None else DEFAULT_EXPIRE_HOURS
     payload = dados.copy()
-    payload["exp"] = int(time.time()) + (expira_horas * 3600)
+    payload["exp"] = int(time.time()) + (horas * 3600)
     payload_json = json.dumps(payload, separators=(',', ':'))
     payload_b64 = base64.urlsafe_b64encode(payload_json.encode('utf-8')).decode('utf-8').rstrip('=')
 
@@ -86,4 +95,3 @@ def obter_usuario_logado(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Usuário não encontrado ou inativo.")
 
     return user
-

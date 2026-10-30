@@ -2,11 +2,18 @@
 venv/
 env/
 .venv/
-venv/
+
 # Variáveis de Ambiente e Chaves de API
 .env
 .env.local
 .env.*.local
+
+# Banco de dados e logs locais (não enviar para deploy)
+*.db
+*.sqlite
+*.sqlite3
+*.log
+camera_diag.log
 
 # Python / Compilação / Cache
 __pycache__/
@@ -22,6 +29,9 @@ __pycache__/
 best/
 runs/
 hidrometro_runs/
+
+# Exceção: O modelo oficial da aplicação deve ser mantido
+!modelos_ia/pegarvisor.pt
 
 # Pastas de Saída e Imagens Temporárias
 saida_recortes/
@@ -39,5 +49,4 @@ water-meter-3/
 .idea/
 *.swp
 *.swo
-.DS_Store
-
+*.DS_Store

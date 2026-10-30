@@ -52,3 +52,21 @@ class Leitura(Base):
     def __repr__(self):
         return f"<Leitura(id={self.id}, apto='{self.apartamento_numero}', ia='{self.leitura_ia}', usuario='{self.leitura_usuario}')>"
 
+
+class FotoInidentificavel(Base):
+    """Tabela de auditoria para fotos que a IA não conseguiu identificar os números."""
+    __tablename__ = "fotos_inidentificaveis"
+
+    id = Column(Integer, primary_key=True, index=True)
+    apartamento_id = Column(Integer, ForeignKey("apartamentos.id"), nullable=True)
+    apartamento_numero = Column(String(50), nullable=True, index=True)
+    condominio = Column(String(100), nullable=True, default="Residencial das Palmeiras")
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
+    usuario_nome = Column(String(100), nullable=True)
+    motivo_falha = Column(Text, nullable=False, default="Não foi possível identificar os dígitos do visor")
+    caminho_foto = Column(String(255), nullable=True)
+    modelo_tentado = Column(String(100), nullable=True)
+    criado_em = Column(DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<FotoInidentificavel(id={self.id}, apto='{self.apartamento_numero}', motivo='{self.motivo_falha[:30]}')>"

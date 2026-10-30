@@ -27,6 +27,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectCondominio = document.getElementById("select-condominio");
     const selectApartamento = document.getElementById("select-apartamento");
     const btnAddApto = document.getElementById("btn-add-apto");
+
+    // Elementos de IHC: Alerta de Duplicidade e Progresso
+    const cardAvisoDuplicidade = document.getElementById("card-aviso-duplicidade");
+    const avisoTituloDuplicidade = document.getElementById("aviso-titulo-duplicidade");
+    const avisoBadgeTempo = document.getElementById("aviso-badge-tempo");
+    const avisoValorAnt = document.getElementById("aviso-valor-ant");
+    const avisoOpAnt = document.getElementById("aviso-op-ant");
+    const progressoTextoStats = document.getElementById("progresso-texto-stats");
+    const progressoBarraFill = document.getElementById("progresso-barra-fill");
+    const alertaModalDuplicata = document.getElementById("alerta-modal-duplicata");
+    const modalDupVal = document.getElementById("modal-dup-val");
+    const modalDupData = document.getElementById("modal-dup-data");
+
+    let mapaApartamentos = {};
     const fileInputCamera = document.getElementById("file-input-camera");
     const fileInputGallery = document.getElementById("file-input-gallery");
     const btnProcess = document.getElementById("btn-process");
@@ -130,29 +144,73 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function atualizarAvisoDuplicidade(aptoNum) {
+        if (!cardAvisoDuplicidade) return;
+        const ap = mapaApartamentos[String(aptoNum)];
+        if (ap && (ap.lido_hoje || ap.lido_este_mes)) {
+            cardAvisoDuplicidade.style.display = "flex";
+            if (ap.lido_hoje) {
+                if (avisoTituloDuplicidade) avisoTituloDuplicidade.textContent = "APTO JÁ MEDIDO HOJE!";
+                if (avisoBadgeTempo) avisoBadgeTempo.textContent = "Hoje";
+            } else {
+                if (avisoTituloDuplicidade) avisoTituloDuplicidade.textContent = "APTO JÁ MEDIDO ESTE MÊS!";
+                if (avisoBadgeTempo) avisoBadgeTempo.textContent = ap.ultima_leitura_data || "Este mês";
+            }
+            if (avisoValorAnt) avisoValorAnt.textContent = `${ap.ultima_leitura_valor || "---"} m³`;
+            if (avisoOpAnt) avisoOpAnt.textContent = ap.ultima_leitura_operador || "Operador";
+        } else {
+            cardAvisoDuplicidade.style.display = "none";
+        }
+    }
+
+    function atualizarBarraProgresso(aptos) {
+        if (!progressoTextoStats || !progressoBarraFill) return;
+        const total = aptos.length;
+        const lidos = aptos.filter(a => a.lido_este_mes).length;
+        const pct = total > 0 ? Math.round((lidos / total) * 100) : 0;
+        progressoTextoStats.textContent = `${lidos} de ${total} medidos (${pct}%)`;
+        progressoBarraFill.style.width = `${pct}%`;
+    }
+
     async function carregarApartamentosPorCondominio(condoNome, aptoPreSelecionado = null) {
         selectApartamento.innerHTML = '<option value="">Carregando apartamentos...</option>';
+        mapaApartamentos = {};
         try {
             const resp = await fetch(`/api/v1/apartamentos?condominio=${encodeURIComponent(condoNome)}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const aptos = await resp.json();
 
+            atualizarBarraProgresso(aptos);
+
             selectApartamento.innerHTML = '<option value="">-- Selecione o Apartamento --</option>';
             aptos.forEach(ap => {
+                mapaApartamentos[String(ap.numero)] = ap;
                 const opt = document.createElement("option");
                 opt.value = ap.numero;
-                opt.textContent = `Apto ${ap.numero} (${ap.bloco || "Bloco A"})`;
+
+                if (ap.lido_hoje) {
+                    opt.textContent = `✅ Apto ${ap.numero} • LIDO HOJE (${ap.ultima_leitura_valor || "---"} m³) - ${ap.bloco || "Bloco A"}`;
+                    opt.style.color = "#047857";
+                    opt.style.fontWeight = "bold";
+                } else if (ap.lido_este_mes) {
+                    opt.textContent = `📅 Apto ${ap.numero} • Lido no mês (${ap.ultima_leitura_valor || "---"} m³) - ${ap.bloco || "Bloco A"}`;
+                    opt.style.color = "#0284c7";
+                } else {
+                    opt.textContent = `⏳ Apto ${ap.numero} • PENDENTE - ${ap.bloco || "Bloco A"}`;
+                    opt.style.color = "#b45309";
+                }
                 selectApartamento.appendChild(opt);
             });
 
-            // Se um apartamento foi passado na URL ou salvo no localStorage, seleciona-o
             if (aptoPreSelecionado) {
                 const existe = aptos.some(a => String(a.numero) === String(aptoPreSelecionado));
                 if (existe) {
                     selectApartamento.value = String(aptoPreSelecionado);
                 }
             }
+
+            atualizarAvisoDuplicidade(selectApartamento.value);
         } catch (e) {
             selectApartamento.innerHTML = '<option value="">Erro ao listar apartamentos</option>';
         }
@@ -177,7 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (selectApartamento) {
         selectApartamento.addEventListener("change", () => {
-            localStorage.setItem("hidroreader_apto_ativo", selectApartamento.value);
+            const aVal = selectApartamento.value;
+            localStorage.setItem("hidroreader_apto_ativo", aVal);
+            atualizarAvisoDuplicidade(aVal);
         });
     }
 
@@ -695,7 +755,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const lTitle = loadingView.querySelector(".loading-title");
         const lSub = loadingView.querySelector(".loading-subtitle");
         if (lTitle) lTitle.textContent = "Analisando visor mecânico...";
-        if (lSub) lSub.textContent = "YOLO recorta o visor e Gemini lê os dígitos";
+        if (lSub) lSub.textContent = "Identificando numeração do hidrômetro...";
         resultCard.classList.remove("active");
         btnProcess.disabled = true;
 
@@ -728,6 +788,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             ultimaPredicaoIA = data;
 
+            if (data.inidentificavel) {
+                showToast("⚠️ Foto ilegível registrada na auditoria. Você pode digitar os números manualmente.", false);
+            }
+
             // Prepara a tela de confirmação solicitada pelo usuário
             const valorLido = (data.leitura_ia || data.leitura_completa || "").trim();
             leituraIaImutavel = valorLido; // Grava em memória imutável
@@ -737,6 +801,16 @@ document.addEventListener("DOMContentLoaded", () => {
             confirmReadingNumber.textContent = valorLido;
             if (inputOriginalIaVal) inputOriginalIaVal.value = valorLido;
             inputConfirmVal.value = valorLido;
+
+            // Verifica se este apartamento já tinha leitura anterior para alertar no modal (IHC)
+            const apInfo = mapaApartamentos[String(aptoSelecionado)];
+            if (apInfo && (apInfo.lido_hoje || apInfo.lido_este_mes) && alertaModalDuplicata) {
+                alertaModalDuplicata.style.display = 'block';
+                if (modalDupVal) modalDupVal.textContent = (apInfo.ultima_leitura_valor || '---') + ' m³';
+                if (modalDupData) modalDupData.textContent = apInfo.ultima_leitura_data || 'recentemente';
+            } else if (alertaModalDuplicata) {
+                alertaModalDuplicata.style.display = 'none';
+            }
 
             // Abre o modal de confirmação
             abrirModal(modalConfirmacao);
@@ -817,7 +891,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 fecharModal(modalConfirmacao);
                 exibirResultadoFinal(ultimaPredicaoIA, apto, valorConfirmado, valorOriginalIA);
-                showToast(`Medição do Apto ${apto} salva com sucesso!`, true);
+                showToast(`Medicao do Apto ${apto} salva com sucesso!`, true);
+                await carregarApartamentosPorCondominio(condo, apto);
             } catch (e) {
                 showToast("Erro: " + e.message, false);
             } finally {
@@ -852,35 +927,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Metadados
-        let metaTexto = `Modelo: ${data.modelo_utilizado || "IA Vision"}`;
-        if (data.confianca_media) {
-            metaTexto += ` • Confiança: ${data.confianca_media}%`;
-        }
+        // Confirmação Direta e Limpa (sem detalhes técnicos ou modelo)
+        let metaTexto = `<span style="color:#047857; font-weight:600; font-size:13px;">✅ Leitura confirmada e salva no banco de dados.</span>`;
         if (valorIAOriginal && valorIAOriginal !== valorFinal) {
-            metaTexto += `<br><span style="font-size:11px; color:#0369a1; font-weight:600;">(Valor Confirmado: <strong>${valorFinal}</strong> • IA original: <strong>${valorIAOriginal}</strong>)</span>`;
+            metaTexto += `<br><span style="font-size:11px; color:#0369a1; font-weight:600;">(Ajustado pelo operador: <strong>${valorFinal}</strong>)</span>`;
         }
-        metaTexto += `<br><span style="font-size:11px; color:#555;">Salvo e confirmado no banco de dados.</span>`;
         readingMeta.innerHTML = metaTexto;
 
-        // Renderização dos Roletes Individuais
-        digitsContainer.innerHTML = "";
-        const qtdPretos = data.digitos_pretos ? data.digitos_pretos.length : 4;
-
-        if (data.digitos && data.digitos.length > 0) {
-            data.digitos.forEach((d, idx) => {
-                const box = document.createElement("div");
-                const isVermelho = idx >= qtdPretos;
-                box.className = `digit-rolete ${isVermelho ? "rolete-vermelho" : "rolete-preto"}`;
-                
-                box.innerHTML = `
-                    <div class="rolete-pos">#${d.posicao}</div>
-                    <div class="rolete-char">${valorFinal[idx] || d.valor_yolo}</div>
-                    <div class="rolete-conf">${d.confianca_yolo ? d.confianca_yolo + '%' : 'IA'}</div>
-                `;
-                digitsContainer.appendChild(box);
-            });
+        // Oculta blocos técnicos de roletes individuais conforme IHC solicitado
+        if (digitsContainer) {
+            digitsContainer.innerHTML = "";
+            digitsContainer.style.display = "none";
         }
+        const roletesTitle = document.querySelector(".roletes-title");
+        if (roletesTitle) roletesTitle.style.display = "none";
 
         // Alertas de baixa confiança
         if (data.avisos && data.avisos.length > 0) {

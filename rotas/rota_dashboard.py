@@ -15,23 +15,21 @@ async def obter_resumo_dashboard(
     usuario: Usuario = Depends(obter_usuario_logado)
 ):
     """
-    Retorna estatísticas consolidadas para a tela inicial estilo Nubank:
+    Retorna estatísticas consolidadas para a tela inicial:
     - Total de apartamentos cadastrados
     - Total de leituras realizadas
     - Consumo total acumulado (m³)
-    - Lista das últimas leituras registradas
+    - Lista das últimas leituras registradas com links das fotos
     """
     total_aptos = db.query(Apartamento).filter(Apartamento.ativo == True).count()
     total_leituras = db.query(Leitura).count()
 
-    # Cálculo estimado do volume total acumulado
     leituras = db.query(Leitura).order_by(Leitura.criado_em.desc()).limit(15).all()
 
     ultimas = []
     volume_total = 0.0
 
     for l in leituras:
-        # Tenta extrair os m³ dos dígitos pretos ou leitura
         valor_str = l.leitura_usuario or "0"
         try:
             m3_val = float(valor_str[:4]) if len(valor_str) >= 4 else float(valor_str)
@@ -52,6 +50,7 @@ async def obter_resumo_dashboard(
             "foi_ajustada": foi_ajustada,
             "operador": l.usuario_nome or "Operador",
             "confianca": f"{l.confianca_media:.0f}%",
+            "caminho_foto": l.caminho_foto,
             "data": l.criado_em.strftime("%d/%m/%Y %H:%M") if l.criado_em else "---",
             "observacoes": l.observacoes or "Normal"
         })
@@ -70,12 +69,12 @@ async def exportar_leituras_csv(
     db: Session = Depends(get_db),
     usuario: Usuario = Depends(obter_usuario_logado)
 ):
-    """Gera e faz download de uma planilha CSV com todo o histórico de leituras do condomínio."""
+    """Gera e faz download de uma planilha CSV com todo o histórico de leituras do condomínio e links das fotos."""
     leituras = db.query(Leitura).order_by(Leitura.criado_em.desc()).all()
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter=';')
-    writer.writerow(["ID", "Apartamento", "Leitura Final (m³)", "Leitura IA", "Alteração Usuário", "Confiança IA", "Operador", "Observações", "Data/Hora"])
+    writer.writerow(["ID", "Apartamento", "Leitura Final (m³)", "Leitura IA", "Alteração Usuário", "Confiança IA", "Operador", "Observações", "Link da Foto", "Data/Hora"])
 
     for l in leituras:
         writer.writerow([
@@ -87,13 +86,13 @@ async def exportar_leituras_csv(
             f"{l.confianca_media:.1f}%" if l.confianca_media else "",
             l.usuario_nome or "",
             l.observacoes or "",
+            l.caminho_foto or "",
             l.criado_em.strftime("%d/%m/%Y %H:%M:%S") if l.criado_em else ""
         ])
 
-    csv_data = output.getvalue().encode('utf-8-sig') # utf-8-sig para abrir com acentuação correta no Excel brasileiro
+    csv_data = output.getvalue().encode('utf-8-sig') # utf-8-sig para acentuação correta no Excel brasileiro
     return Response(
         content=csv_data,
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=relatorio_leituras_hidrometro.csv"}
     )
-

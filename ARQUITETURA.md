@@ -9,8 +9,9 @@ Este documento descreve detalhadamente o padrão arquitetural do **HidroReader M
 O sistema é construído sobre os pilares da **Clean Architecture** adaptada para **FastAPI**:
 
 1. **Separação Estrita de Responsabilidades:** Cada diretório possui um único propósito bem definido.
-2. **Desacoplamento:** A interface web (`app/static/`) não acessa banco de dados; a API (`app/api/`) não implementa redes neurais diretamente; a IA (`app/services/vision/`) não lida com requisições HTTP.
-3. **Pronto para Produção (12-Factor App):** Configurações externas via variáveis de ambiente (`.env`), suporte a containers (`Docker`), persistência flexível (SQLite local ou PostgreSQL em produção) e health checks para monitoramento.
+2. **Custo Mínimo de Operação:** Otimização para visão computacional com `gpt-4o-mini`, redimensionamento em 1 tile e cache LRU por hash SHA-256.
+3. **Dupla Verificação e Resiliência:** 1ª verificação com recorte YOLO e 2ª verificação com ChatGPT Vision, com contingência automática se o visor estiver em ângulo difícil.
+4. **Pronto para Produção (12-Factor App):** Configurações externas via variáveis de ambiente (`.env`), suporte a containers (`Docker`), persistência flexível (SQLite local ou PostgreSQL em produção) e health checks para monitoramento.
 
 ---
 
@@ -23,17 +24,21 @@ O sistema é construído sobre os pilares da **Clean Architecture** adaptada par
 | **`rotas/`** | **Camada HTTP / Endpoints** | Roteadores FastAPI dedicados (`rota_login.py`, `rota_apartamentos.py`, `rota_leitura.py`, `rota_dashboard.py`, `rota_paginas.py`). | Consultas SQL pesadas diretas ou inferência direta de redes neurais. |
 | **`banco/`** | **Conexão e Modelos ORM** | Configuração do SQLAlchemy (`conexao.py`) e tabelas relacionais (`modelos.py`: `Usuario`, `Apartamento`, `Leitura`). | Rotas HTTP, regras visuais. |
 | **`seguranca/`** | **Autenticação e Sessão** | Hashing de senhas, criação e validação de tokens JWT (`autenticacao.py`). | Lógica de negócio de apartamentos ou fotos. |
-| **`ia/`** | **Visão Computacional e IA** | Pipeline de Visão (`leitor_ia.py`): detecção/recorte do visor com YOLO e leitura dos dígitos com Gemini Vision. | Endpoints HTTP diretos. |
-| **`telas/`** | **Frontend Mobile** | Interface Web responsiva: HTMLs (`login.html`, `dashboard.html`, `leitor.html`), estilos (`css/mobile.css`) e scripts (`js/`). | Códigos Python ou arquivos de backend. |
+| **`ia/`** | **Visão Computacional e IA** | Pipeline de Visão (`leitor_ia.py`): detecção/recorte com YOLO, leitura com OpenAI `gpt-4o-mini` e Gemini Vision de contingência. | Endpoints HTTP diretos. |
+| **`telas/`** | **Frontend Mobile** | Interface Web responsiva: HTMLs (`login.html`, `dashboard.html`, `leitor.html`), estilos e scripts (`js/app.js`). | Códigos Python ou arquivos de backend. |
 | **`modelos_ia/`** | **Pesos de Machine Learning** | Arquivos de pesos treinados das redes neurais (`pegarvisor.pt`). | Códigos Python ou datasets brutos. |
 
 ---
 
-### 4. Arquivos de Raiz
-- **`run.py`**: Ponto de partida único para iniciar o servidor em desenvolvimento (descobre o IP da rede Wi-Fi para testes no celular).
-- **`Dockerfile` & `docker-compose.yml`**: Configurações de container otimizadas para deploy em produção.
-- **`.env` / `.env.example`**: Configurações de chaves e variáveis de ambiente.
-- **`hidroreader.db`**: Banco de dados SQLite padrão para desenvolvimento.
+## 💰 Arquitetura de Custo Mínimo de IA
+
+| Camada de Otimização | Estratégia Implementada | Impacto no Custo |
+| :--- | :--- | :--- |
+| **Modelo** | OpenAI `gpt-4o-mini` | Mais de 90% mais barato que modelos topo de linha |
+| **Tiles de Imagem** | Redimensionamento para 1 único tile de 512px | De 1.000+ tokens para apenas **255 tokens** por foto |
+| **Output Tokens** | `max_tokens=150` com JSON estrito | Elimina saídas prolixas e alucinações |
+| **Cache SHA-256** | Cache local em memória por hash da imagem | Fotos repetidas ou reanalisadas custam **R$ 0,00** |
+| **Contingência** | YOLO recorta visor -> Se falhar, ChatGPT lê a foto inteira | Evita fotos perdidas ou operadores bloqueados |
 
 ---
 
@@ -43,48 +48,22 @@ O sistema é construído sobre os pilares da **Clean Architecture** adaptada par
 sequenceDiagram
     autonumber
     actor Operador as 📱 Operador (Celular)
-    participant Front as 🎨 Frontend (app/static)
-    participant API as 🌐 Endpoint (app/api/v1/leituras)
-    participant Dep as 🔒 Segurança (app/api/deps)
-    participant IA as 🧠 Visão (app/services/vision)
-    participant DB as 🗄️ Banco de Dados (app/models)
+    participant Front as 🎨 Frontend (telas/js/app.js)
+    participant API as 🌐 Endpoint (rotas/rota_leitura.py)
+    participant IA as 🧠 Visão IA (ia/leitor_ia.py)
+    participant DB as 🗄️ Banco de Dados (banco/conexao.py)
 
-    Operador->>Front: Seleciona apartamento e tira foto do hidrômetro
-    Front->>API: POST /api/v1/leituras/processar (Multipart Form + Bearer Token)
-    API->>Dep: Valida token JWT do operador
-    Dep-->>API: Operador autenticado (ex: Admin)
-    API->>IA: visao_service.processar_imagem(bytes)
-    IA->>IA: 1. YOLO detecta e recorta o visor (modelos_ia/pegarvisor.pt)
-    IA->>IA: 2. Filtro Sobel avalia foco e contraste
-    IA->>IA: 3. Gemini Vision lê e separa m³ (pretos) e Litros (vermelhos)
-    IA-->>API: Resultado estruturado (LeituraResponseSchema)
-    API->>DB: Salva registro na tabela 'leituras' com apto_id e usuario_id
-    DB-->>API: Confirmação de persistência
-    API-->>Front: Retorna JSON com medição e separação cromática
-    Front-->>Operador: Exibe card de medição e roletes coloridos na tela
+    Operador->>Front: Bate a foto do hidrômetro
+    Front->>API: POST /api/v1/leituras/pre-carregar
+    API-->>Front: Retorna miniatura leve no visor
+    Operador->>Front: Clica em "Analisar com IA"
+    Front->>API: POST /api/v1/leituras/analisar
+    API->>IA: Processar foto (YOLO + ChatGPT Vision)
+    IA-->>API: Retorna leitura (pretos m³ / vermelhos litros)
+    API-->>Front: Exibe no visor para conferência humana
+    Operador->>Front: Clica em "Confirmar e Salvar"
+    Front->>API: POST /api/v1/leituras/confirmar
+    API->>DB: Salva Leitura (leitura_ia imutável e leitura_usuario)
+    DB-->>API: Sucesso
+    API-->>Front: Medição registrada com sucesso!
 ```
-
----
-
-## 🚀 Checklist para Deploy em Produção
-
-Quando você for publicar o sistema em um servidor na nuvem (AWS, DigitalOcean, VPS, Render, etc.):
-
-1. **Trocar a Chave Secreta no `.env`:**
-   ```bash
-   SECRET_KEY="gere_uma_chave_aleatoria_longa_e_segura"
-   ```
-2. **Definir o Ambiente:**
-   ```bash
-   ENVIRONMENT="production"
-   DEBUG=False
-   ```
-3. **CORS Restrito:**
-   No `.env`, limite `CORS_ORIGINS` para o domínio real do seu aplicativo (ex: `https://app.hidroreader.com.br`).
-4. **Deploy com Docker (Recomendado):**
-   ```bash
-   docker compose up -d --build
-   ```
-5. **Monitoramento e Health Check:**
-   O container possui monitoramento contínuo apontando para `http://localhost:8000/health`, verificando a integridade da API, do banco de dados e do modelo de IA.
-
